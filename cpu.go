@@ -66,7 +66,7 @@ func tick() {
 				if !found {
 					panic(fmt.Sprintf("failed to find opcode %x", opWord))
 				}
-				fmt.Printf("executing opcode: %s\n", op.name)
+				fmt.Printf("executing opcode %x as: %s\n", opWord, op.name)
 				op.exec(opWord)
 			}
 		}
