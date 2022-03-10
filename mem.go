@@ -28,26 +28,26 @@ func initRAM() {
 	spriteE := []byte{0xF0, 0x80, 0xF0, 0x80, 0xF0}
 	spriteF := []byte{0xF0, 0x80, 0xF0, 0x80, 0x80}
 	mem = ram{}
-	copy(mem[0+5*0x00:], sprite0)
-	copy(mem[0+5*0x01:], sprite1)
-	copy(mem[0+5*0x02:], sprite2)
-	copy(mem[0+5*0x03:], sprite3)
-	copy(mem[0+5*0x04:], sprite4)
-	copy(mem[0+5*0x05:], sprite5)
-	copy(mem[0+5*0x06:], sprite6)
-	copy(mem[0+5*0x07:], sprite7)
-	copy(mem[0+5*0x08:], sprite8)
-	copy(mem[0+5*0x09:], sprite9)
-	copy(mem[0+5*0x0A:], spriteA)
-	copy(mem[0+5*0x0B:], spriteB)
-	copy(mem[0+5*0x0C:], spriteC)
-	copy(mem[0+5*0x0D:], spriteD)
-	copy(mem[0+5*0x0E:], spriteE)
-	copy(mem[0+5*0x0F:], spriteF)
+	copy(mem[5*0x00:], sprite0)
+	copy(mem[5*0x01:], sprite1)
+	copy(mem[5*0x02:], sprite2)
+	copy(mem[5*0x03:], sprite3)
+	copy(mem[5*0x04:], sprite4)
+	copy(mem[5*0x05:], sprite5)
+	copy(mem[5*0x06:], sprite6)
+	copy(mem[5*0x07:], sprite7)
+	copy(mem[5*0x08:], sprite8)
+	copy(mem[5*0x09:], sprite9)
+	copy(mem[5*0x0A:], spriteA)
+	copy(mem[5*0x0B:], spriteB)
+	copy(mem[5*0x0C:], spriteC)
+	copy(mem[5*0x0D:], spriteD)
+	copy(mem[5*0x0E:], spriteE)
+	copy(mem[5*0x0F:], spriteF)
 }
 
 func byteToFontLoc(b byte) uint16 {
-	return uint16(0 + 5*b)
+	return uint16(5 * b)
 }
 
 func loadROM(path string) error {

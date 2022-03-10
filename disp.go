@@ -46,11 +46,11 @@ func drawSprite(sprite []byte, originX, originY byte) bool {
 	for y, spriteByte := range sprite {
 		for bitIdx := byte(0); bitIdx < 8; bitIdx++ {
 			drawPixel := (0x80>>bitIdx)&spriteByte > 0
-			isLit := disp.fb[(originX+bitIdx)%XRES][(originY+(byte(len(sprite))-byte(y)))%YRES]
+			isLit := disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES]
 			if isLit && !drawPixel {
 				didErase = true
 			}
-			disp.fb[(originX+bitIdx)%XRES][(originY+(byte(len(sprite))-byte(y)))%YRES] = drawPixel
+			disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES] = drawPixel
 		}
 	}
 	return didErase
@@ -66,7 +66,8 @@ func drawWindow(imd *imdraw.IMDraw) {
 				continue
 			}
 			imd.Color = colornames.White
-			imd.Push(pixel.V(float64(rownum*SCALE), float64(colnum*SCALE)), pixel.V(float64(rownum*SCALE+1*SCALE), float64(colnum*SCALE+1*SCALE)))
+			imd.Push(pixel.V(float64(rownum*SCALE), float64(YRES*SCALE-colnum*SCALE)),
+				pixel.V(float64(rownum*SCALE+1*SCALE), float64(YRES*SCALE-colnum*SCALE+1*SCALE)))
 			imd.Rectangle(0.)
 		}
 	}

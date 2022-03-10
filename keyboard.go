@@ -6,43 +6,42 @@ import (
 )
 
 var (
-	k0, k1, k2, k3, k4, k5, k6, k7, k8, k9, ka, kb, kc, kd, ke, kf bool
-	keyPress                                                       chan byte
-	keyWaiting                                                     bool
+	keyPress   chan byte
+	keyWaiting bool
 )
 
 func pollForKeys() {
 	for key, _ := range keys {
-		if disp.window.JustPressed(key) {
-			keys[key] = true
-			if keyWaiting {
+		if disp.window.Pressed(key) {
+			if !keys[key] && keyWaiting {
 				keyPress <- keyToNibble(key)
 				keyWaiting = false
+				keyPress <- keyToNibble(key)
 			}
-		}
-		if disp.window.JustReleased(key) {
+			keys[key] = true
+		} else {
 			keys[key] = false
 		}
 	}
 }
 
 var keys = map[pixelgl.Button]bool{
-	pixelgl.Key0: k0,
-	pixelgl.Key1: k1,
-	pixelgl.Key2: k2,
-	pixelgl.Key3: k3,
-	pixelgl.Key4: k4,
-	pixelgl.Key5: k5,
-	pixelgl.Key6: k6,
-	pixelgl.Key7: k7,
-	pixelgl.Key8: k8,
-	pixelgl.Key9: k9,
-	pixelgl.KeyA: ka,
-	pixelgl.KeyB: kb,
-	pixelgl.KeyC: kc,
-	pixelgl.KeyD: kd,
-	pixelgl.KeyE: ke,
-	pixelgl.KeyF: kf,
+	pixelgl.Key0: false,
+	pixelgl.Key1: false,
+	pixelgl.Key2: false,
+	pixelgl.Key3: false,
+	pixelgl.Key4: false,
+	pixelgl.Key5: false,
+	pixelgl.Key6: false,
+	pixelgl.Key7: false,
+	pixelgl.Key8: false,
+	pixelgl.Key9: false,
+	pixelgl.KeyA: false,
+	pixelgl.KeyB: false,
+	pixelgl.KeyC: false,
+	pixelgl.KeyD: false,
+	pixelgl.KeyE: false,
+	pixelgl.KeyF: false,
 }
 
 func keyToNibble(key pixelgl.Button) byte {
@@ -90,37 +89,37 @@ func isKeyPressed(nibble byte) bool {
 
 	switch nibble {
 	case 0x00:
-		return k0
+		return keys[pixelgl.Key0]
 	case 0x01:
-		return k1
+		return keys[pixelgl.Key1]
 	case 0x02:
-		return k2
+		return keys[pixelgl.Key2]
 	case 0x03:
-		return k3
+		return keys[pixelgl.Key3]
 	case 0x04:
-		return k4
+		return keys[pixelgl.Key4]
 	case 0x05:
-		return k5
+		return keys[pixelgl.Key5]
 	case 0x06:
-		return k6
+		return keys[pixelgl.Key6]
 	case 0x07:
-		return k7
+		return keys[pixelgl.Key7]
 	case 0x08:
-		return k8
+		return keys[pixelgl.Key8]
 	case 0x09:
-		return k9
+		return keys[pixelgl.Key9]
 	case 0x0A:
-		return ka
+		return keys[pixelgl.KeyA]
 	case 0x0B:
-		return kb
+		return keys[pixelgl.KeyB]
 	case 0x0C:
-		return kc
+		return keys[pixelgl.KeyC]
 	case 0x0D:
-		return kd
+		return keys[pixelgl.KeyD]
 	case 0x0E:
-		return ke
+		return keys[pixelgl.KeyE]
 	case 0x0F:
-		return kf
+		return keys[pixelgl.KeyF]
 	default:
 	}
 	panic(fmt.Sprintf("impossible nibble given to numToReg: %x", nibble))

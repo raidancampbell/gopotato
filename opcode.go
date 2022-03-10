@@ -62,7 +62,7 @@ var opcodes = []opcode{
 			return op >= 0x1000 && op < 0x2000
 		},
 		exec: func(op uint16) {
-			pc = op - 0x1000
+			pc = op & 0x0FFF
 		},
 		elapsedMicroseconds: 105,
 		name:                "1nnn: JP addr",
@@ -75,7 +75,7 @@ var opcodes = []opcode{
 		exec: func(op uint16) {
 			sp++
 			stack[sp] = pc
-			pc = op - 0x2000
+			pc = op & 0x0FFF
 		},
 		elapsedMicroseconds: 105,
 		name:                "2nnn: CALL addr",
@@ -115,7 +115,7 @@ var opcodes = []opcode{
 	},
 	{
 		matches: func(op uint16) bool {
-			return op >= 0x5000 && op < 0x6000
+			return op&0xF00F == 0x5000
 		},
 		exec: func(op uint16) {
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
@@ -150,7 +150,7 @@ var opcodes = []opcode{
 		exec: func(op uint16) {
 			r := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			val := byte(op & 0x00FF)
-			*r = *r + val
+			*r += val
 			pc += 2
 		},
 		elapsedMicroseconds: 45,
@@ -221,10 +221,10 @@ var opcodes = []opcode{
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			b := byte(0x00)
-			if *rx+*ry > 255 {
+			if int(*rx)+int(*ry) > 255 {
 				b = byte(0x01)
 			}
-			vf = &b
+			*vf = b
 			*rx += *ry
 			pc += 2
 		},
@@ -243,7 +243,7 @@ var opcodes = []opcode{
 			if *rx > *ry {
 				b = byte(0x01)
 			}
-			vf = &b
+			*vf = b
 			*rx -= *ry
 			pc += 2
 		},
@@ -257,8 +257,8 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
-			b := byte(op & 0x01)
-			vf = &b
+			b := *rx & 0x01
+			*vf = b
 			*rx >>= 1
 			pc += 2
 		},
@@ -277,7 +277,7 @@ var opcodes = []opcode{
 			if *ry > *rx {
 				b = byte(0x01)
 			}
-			vf = &b
+			*vf = b
 			*rx = *ry - *rx
 			pc += 2
 		},
@@ -291,11 +291,11 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
-			b := byte((op & 0x8000) >> (4 * 2))
+			b := *rx & 0x80
 			if b > 0x00 {
 				b = 0x01
 			}
-			vf = &b
+			*vf = b
 			*rx <<= 1
 			pc += 2
 		},
@@ -337,7 +337,6 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			pc = 0x0FFF + uint16(*v0)
-			//TODO: increment PC?
 		},
 		elapsedMicroseconds: 105,
 		name:                "Bnnn: JP V0, addr",
@@ -363,8 +362,7 @@ var opcodes = []opcode{
 			return op >= 0xD000 && op < 0xE000
 		},
 		exec: func(op uint16) {
-			n := byte(op & 0x000F)
-			sprite := mem[i : i+uint16(n)]
+			sprite := mem[i : i+op&0x000F]
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 
