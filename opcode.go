@@ -1,4 +1,4 @@
-package gopotato
+package main
 
 import (
 	"crypto/rand"

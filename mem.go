@@ -1,4 +1,4 @@
-package gopotato
+package main
 
 type ram [0xFFF]byte
 
