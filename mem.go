@@ -1,5 +1,7 @@
 package main
 
+import "io/ioutil"
+
 type ram [0xFFF]byte
 
 var mem ram
@@ -46,4 +48,13 @@ func initRAM() {
 
 func byteToFontLoc(b byte) uint16 {
 	return uint16(0 + 5*b)
+}
+
+func loadROM(path string) error {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	copy(mem[0x200:], b)
+	return nil
 }

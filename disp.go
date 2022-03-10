@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	XRES = 64
-	YRES = 32
+	XRES  = 64
+	YRES  = 32
+	SCALE = 10
 )
 
 type display struct {
@@ -23,12 +24,9 @@ type framebuffer [XRES][YRES]bool
 var disp display
 
 func initDisp() {
-	disp = display{
-		fb: framebuffer{},
-	}
 	cfg := pixelgl.WindowConfig{
 		Title:  "gopotato",
-		Bounds: pixel.R(0, 0, XRES, YRES),
+		Bounds: pixel.R(0, 0, XRES*SCALE, YRES*SCALE),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -68,9 +66,10 @@ func drawWindow(imd *imdraw.IMDraw) {
 				continue
 			}
 			rect := pixel.Rect{
-				Min: pixel.V(float64(rownum), float64(colnum)),
-				Max: pixel.V(float64(rownum), float64(colnum)),
+				Min: pixel.V(float64(rownum*SCALE), float64(colnum*SCALE)),
+				Max: pixel.V(float64(rownum*SCALE+1*SCALE), float64(colnum*SCALE+1*SCALE)),
 			}
+			imd.Color = colornames.White
 			imd.Push(rect.Min, rect.Max)
 			imd.Rectangle(0.)
 		}

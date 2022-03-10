@@ -38,7 +38,7 @@ var opcodes = []opcode{
 			return op == 0x00E0
 		},
 		exec: func(op uint16) {
-			pc++
+			pc += 2
 			disp.fb = framebuffer{}
 		},
 		elapsedMicroseconds: 109,
@@ -86,12 +86,12 @@ var opcodes = []opcode{
 			return op >= 0x3000 && op < 0x4000
 		},
 		exec: func(op uint16) {
-			v := numToReg(byte((op & 0x0F00) >> 2))
+			v := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			val := byte(op & 0x00FF)
 			if *v == val {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 55,
 		name:                "3xkk: SE Vx, byte",
@@ -102,12 +102,12 @@ var opcodes = []opcode{
 			return op >= 0x4000 && op < 0x5000
 		},
 		exec: func(op uint16) {
-			v := numToReg(byte((op & 0x0F00) >> 2))
+			v := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			val := byte(op & 0x00FF)
 			if *v != val {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 55,
 		name:                "4xkk: SNE Vx, byte",
@@ -118,12 +118,12 @@ var opcodes = []opcode{
 			return op >= 0x5000 && op < 0x6000
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			if *rx == *ry {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 73,
 		name:                "5xy0: SE Vx, Vy",
@@ -134,10 +134,10 @@ var opcodes = []opcode{
 			return op >= 0x6000 && op < 0x7000
 		},
 		exec: func(op uint16) {
-			r := numToReg(byte((op & 0x0F00) >> 2))
+			r := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			val := byte(op & 0x00FF)
 			*r = val
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 27,
 		name:                "6xkk: LD Vx, byte",
@@ -148,10 +148,10 @@ var opcodes = []opcode{
 			return op >= 0x7000 && op < 0x8000
 		},
 		exec: func(op uint16) {
-			r := numToReg(byte((op & 0x0F00) >> 2))
+			r := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			val := byte(op & 0x00FF)
 			*r = *r + val
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 45,
 		name:                "7xkk: ADD Vx, byte",
@@ -162,10 +162,10 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0000
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			*rx = *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy0: LD Vx, Vy",
@@ -176,10 +176,10 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0001
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			*rx |= *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy1: OR Vx, Vy",
@@ -190,10 +190,10 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0002
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			*rx &= *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy2: AND Vx, Vy",
@@ -204,10 +204,10 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0003
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			*rx ^= *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy3: XOR Vx, Vy",
@@ -218,15 +218,15 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0004
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			b := byte(0x00)
 			if *rx+*ry > 255 {
 				b = byte(0x01)
 			}
 			vf = &b
 			*rx += *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy4: ADD Vx, Vy",
@@ -237,15 +237,15 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0005
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			b := byte(0x00)
 			if *rx > *ry {
 				b = byte(0x01)
 			}
 			vf = &b
 			*rx -= *ry
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy5: SUB Vx, Vy",
@@ -256,11 +256,11 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0006
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			b := byte(op & 0x01)
 			vf = &b
 			*rx >>= 1
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy6: SHR Vx {, Vy}",
@@ -271,15 +271,15 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x0007
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			b := byte(0x00)
 			if *ry > *rx {
 				b = byte(0x01)
 			}
 			vf = &b
 			*rx = *ry - *rx
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xy7: SUBN Vx, Vy",
@@ -290,14 +290,14 @@ var opcodes = []opcode{
 			return op >= 0x8000 && op < 0x9000 && op&0x000F == 0x000E
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			b := byte((op & 0x8000) >> 2)
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			b := byte((op & 0x8000) >> (4 * 2))
 			if b > 0x00 {
 				b = 0x01
 			}
 			vf = &b
 			*rx <<= 1
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 200,
 		name:                "8xyE: SHL Vx {, Vy}",
@@ -308,12 +308,12 @@ var opcodes = []opcode{
 			return op >= 0x9000 && op < 0xA000 && op&0x000F == 0x0000
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 			if *rx != *ry {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 73,
 		name:                "9xy0: SNE Vx, Vy",
@@ -325,7 +325,7 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			i = op & 0x0FFF
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 55,
 		name:                "Annn: LD I, addr",
@@ -348,11 +348,11 @@ var opcodes = []opcode{
 			return op >= 0xB000 && op < 0xC000
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			randByte := make([]byte, 1)
 			rand.Read(randByte)
 			*rx = randByte[0] & byte(op&0x00FF)
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 164,
 		name:                "Cxkk: RND Vx, byte",
@@ -364,12 +364,17 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			n := byte(op & 0x000F)
-			sprite := mem[i:n]
-			rx := numToReg(byte((op & 0x0F00) >> 2))
-			ry := numToReg(byte((op & 0x00F0) >> 1))
+			sprite := mem[i : i+uint16(n)]
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			ry := numToReg(byte((op & 0x00F0) >> (4 * 1)))
 
-			drawSprite(sprite, *rx, *ry)
-			pc++
+			didErase := drawSprite(sprite, *rx, *ry)
+			if didErase {
+				*vf = 0x01
+			} else {
+				*vf = 0x00
+			}
+			pc += 2
 		},
 		elapsedMicroseconds: 22734,
 		name:                "Dxyn: DRW Vx, Vy, nibble",
@@ -380,11 +385,11 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xE09E
 		},
 		exec: func(op uint16) {
-			k := isKeyPressed(byte((op & 0x0F00) >> 2))
+			k := isKeyPressed(byte((op & 0x0F00) >> (4 * 2)))
 			if k {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 73,
 		name:                "Ex9E: SKP Vx",
@@ -395,11 +400,11 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xE0A1
 		},
 		exec: func(op uint16) {
-			k := isKeyPressed(byte((op & 0x0F00) >> 2))
+			k := isKeyPressed(byte((op & 0x0F00) >> (4 * 2)))
 			if !k {
-				pc++
+				pc += 2
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 73,
 		name:                "ExA1: SKNP Vx",
@@ -410,9 +415,9 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF007
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			*rx = *dt
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 45,
 		name:                "Fx07: LD Vx, DT",
@@ -423,10 +428,10 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF00A
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			keyWaiting = true
 			*rx = <-keyPress
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 0,
 		name:                "Fx0A: LD Vx, K",
@@ -437,9 +442,9 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF015
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			*dt = *rx
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 45,
 		name:                "Fx15: LD DT, Vx",
@@ -450,9 +455,9 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF018
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			*st = *rx
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 45,
 		name:                "Fx18: LD ST, Vx",
@@ -463,9 +468,9 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF01E
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			i += uint16(*rx)
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 86,
 		name:                "Fx1E: ADD I, Vx",
@@ -476,9 +481,9 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF029
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			i = byteToFontLoc(*rx)
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 91,
 		name:                "Fx29: LD F, Vx",
@@ -489,7 +494,7 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF033
 		},
 		exec: func(op uint16) {
-			rx := numToReg(byte((op & 0x0F00) >> 2))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
 			if *rx >= 100 {
 				hundreds := *rx / 100
 				mem[i] = intToHex(int(hundreds))
@@ -505,7 +510,7 @@ var opcodes = []opcode{
 				ones := *rx - hundreds - tens
 				mem[i+2] = intToHex(int(ones))
 			}
-			pc++
+			pc += 2
 		},
 		elapsedMicroseconds: 927,
 		name:                "Fx33: LD B, Vx",
@@ -516,11 +521,12 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF055
 		},
 		exec: func(op uint16) {
-			maxReg := byte((op & 0x0F00) >> 2)
+			maxReg := byte((op & 0x0F00) >> (4 * 2))
 			for itr := byte(0); itr <= maxReg; itr++ {
 				rx := numToReg(itr)
 				mem[i+uint16(itr)] = *rx
 			}
+			pc += 2
 		},
 		elapsedMicroseconds: 605,
 		name:                "Fx55: LD [I], Vx",
@@ -531,11 +537,12 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xF065
 		},
 		exec: func(op uint16) {
-			maxReg := byte((op & 0x0F00) >> 2)
+			maxReg := byte((op & 0x0F00) >> (4 * 2))
 			for itr := byte(0); itr <= maxReg; itr++ {
 				rx := numToReg(itr)
 				*rx = mem[i+uint16(itr)]
 			}
+			pc += 2
 		},
 		elapsedMicroseconds: 605,
 		name:                "Fx65: LD Vx, [I]",

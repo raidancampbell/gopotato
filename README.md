@@ -10,6 +10,6 @@ A CHIP-8 emulator written in golang
  - [X] add support for a keyboard
  - [X] implement opcodes Ex9E onwards
  - [ ] emit sound
- - [ ] read a ROM into memory
+ - [X] read a ROM into memory
  - [X] add hardcoded 5-byte hex font
  - [ ] (maybe): render output to terminal instead of a graphical display

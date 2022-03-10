@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -18,26 +20,62 @@ var (
 	stack  [16]uint16
 )
 
-func Init() {
-	initDisp()
+func init() {
+	pc = 0x200
 	initRAM()
-	go timerTick()
-	go tick()
+	v0 = new(byte)
+	v1 = new(byte)
+	v2 = new(byte)
+	v3 = new(byte)
+	v4 = new(byte)
+	v5 = new(byte)
+	v6 = new(byte)
+	v7 = new(byte)
+	v8 = new(byte)
+	v9 = new(byte)
+	va = new(byte)
+	vb = new(byte)
+	vc = new(byte)
+	vd = new(byte)
+	ve = new(byte)
+	vf = new(byte)
+	dt = new(byte)
+	st = new(byte)
+	disp = display{
+		Mutex: &sync.Mutex{},
+	}
 }
 
 // emulate the CPU at 512hz
 func tick() {
-	tim := time.NewTimer(1953 * time.Microsecond)
+	tim := time.NewTicker(19530 * time.Microsecond)
 	for {
 		select {
 		case <-tim.C:
+			for itr := 0; itr < 16; itr++ {
+				opWord := binary.BigEndian.Uint16([]byte{mem[pc], mem[pc+1]})
+				var op opcode
+				found := false
+				for opItr := range opcodes {
+					if opcodes[opItr].matches(opWord) {
+						op = opcodes[opItr]
+						found = true
+						break
+					}
+				}
+				if !found {
+					panic(fmt.Sprintf("failed to find opcode %x", opWord))
+				}
+				fmt.Printf("executing opcode: %s\n", op.name)
+				op.exec(opWord)
+			}
 		}
 	}
 }
 
 // timerTick controls
 func timerTick() {
-	tim := time.NewTimer(16667 * time.Microsecond)
+	tim := time.NewTicker(16667 * time.Microsecond)
 
 	for {
 		select {
