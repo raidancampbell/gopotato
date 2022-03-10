@@ -20,6 +20,7 @@ var (
 
 func Init() {
 	initDisp()
+	initRAM()
 	go timerTick()
 	go tick()
 }
@@ -41,6 +42,7 @@ func timerTick() {
 	for {
 		select {
 		case <-tim.C:
+			pollForKeys() // abusively putting this in the timer code.  we don't need to poll that often
 			if *dt != 0x00 {
 				*dt--
 			}
@@ -92,4 +94,30 @@ func numToReg(nibble byte) reg {
 	default:
 	}
 	panic(fmt.Sprintf("impossible nibble given to numToReg: %x", nibble))
+}
+
+func intToHex(i int) byte {
+	switch i {
+	case 0:
+		return 0x00
+	case 1:
+		return 0x01
+	case 2:
+		return 0x02
+	case 3:
+		return 0x03
+	case 4:
+		return 0x04
+	case 5:
+		return 0x05
+	case 6:
+		return 0x06
+	case 7:
+		return 0x07
+	case 8:
+		return 0x08
+	case 9:
+		return 0x09
+	}
+	panic(fmt.Sprintf("unexpected int %d given to intToHex", i))
 }

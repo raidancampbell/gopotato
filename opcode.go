@@ -1,6 +1,8 @@
 package gopotato
 
-import "crypto/rand"
+import (
+	"crypto/rand"
+)
 
 type opcode struct {
 	matches             func(op uint16) bool
@@ -37,7 +39,7 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			pc++
-			disp = [64][32]bool{}
+			disp.fb = framebuffer{}
 		},
 		elapsedMicroseconds: 109,
 		name:                "00E0: CLS",
@@ -326,7 +328,7 @@ var opcodes = []opcode{
 			pc++
 		},
 		elapsedMicroseconds: 55,
-		name:                "Annn - LD I, addr",
+		name:                "Annn: LD I, addr",
 		description:         "Set I = nnn.",
 	},
 	{
@@ -338,7 +340,7 @@ var opcodes = []opcode{
 			//TODO: increment PC?
 		},
 		elapsedMicroseconds: 105,
-		name:                "Bnnn - JP V0, addr",
+		name:                "Bnnn: JP V0, addr",
 		description:         "Jump to location nnn + V0.",
 	},
 	{
@@ -353,7 +355,7 @@ var opcodes = []opcode{
 			pc++
 		},
 		elapsedMicroseconds: 164,
-		name:                "Cxkk - RND Vx, byte",
+		name:                "Cxkk: RND Vx, byte",
 		description:         "Set Vx = random byte AND kk.",
 	},
 	{
@@ -367,11 +369,176 @@ var opcodes = []opcode{
 			ry := numToReg(byte((op & 0x00F0) >> 1))
 
 			drawSprite(sprite, *rx, *ry)
+			pc++
 		},
 		elapsedMicroseconds: 22734,
-		name:                "Dxyn - DRW Vx, Vy, nibble",
+		name:                "Dxyn: DRW Vx, Vy, nibble",
 		description:         "Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.",
 	},
-
-	//TODO: Ex9E onwards.  Needs a keyboard
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xE09E
+		},
+		exec: func(op uint16) {
+			k := isKeyPressed(byte((op & 0x0F00) >> 2))
+			if k {
+				pc++
+			}
+			pc++
+		},
+		elapsedMicroseconds: 73,
+		name:                "Ex9E: SKP Vx",
+		description:         "Skip next instruction if key with the value of Vx is pressed.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xE0A1
+		},
+		exec: func(op uint16) {
+			k := isKeyPressed(byte((op & 0x0F00) >> 2))
+			if !k {
+				pc++
+			}
+			pc++
+		},
+		elapsedMicroseconds: 73,
+		name:                "ExA1: SKNP Vx",
+		description:         "Skip next instruction if key with the value of Vx is not pressed.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF007
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			*rx = *dt
+			pc++
+		},
+		elapsedMicroseconds: 45,
+		name:                "Fx07: LD Vx, DT",
+		description:         "Set Vx = delay timer value.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF00A
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			keyWaiting = true
+			*rx = <-keyPress
+			pc++
+		},
+		elapsedMicroseconds: 0,
+		name:                "Fx0A: LD Vx, K",
+		description:         "Wait for a key press, store the value of the key in Vx.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF015
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			*dt = *rx
+			pc++
+		},
+		elapsedMicroseconds: 45,
+		name:                "Fx15: LD DT, Vx",
+		description:         "Set delay timer = Vx.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF018
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			*st = *rx
+			pc++
+		},
+		elapsedMicroseconds: 45,
+		name:                "Fx18: LD ST, Vx",
+		description:         "Set sound timer = Vx.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF01E
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			i += uint16(*rx)
+			pc++
+		},
+		elapsedMicroseconds: 86,
+		name:                "Fx1E: ADD I, Vx",
+		description:         "Set I = I + Vx.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF029
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			i = byteToFontLoc(*rx)
+			pc++
+		},
+		elapsedMicroseconds: 91,
+		name:                "Fx29: LD F, Vx",
+		description:         "Set I = location of sprite for digit Vx.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF033
+		},
+		exec: func(op uint16) {
+			rx := numToReg(byte((op & 0x0F00) >> 2))
+			if *rx >= 100 {
+				hundreds := *rx / 100
+				mem[i] = intToHex(int(hundreds))
+			}
+			if *rx >= 10 {
+				hundreds := *rx / 100
+				tens := (*rx - hundreds) / 10
+				mem[i+1] = intToHex(int(tens))
+			}
+			if *rx >= 1 {
+				hundreds := *rx / 100
+				tens := (*rx - hundreds) / 10
+				ones := *rx - hundreds - tens
+				mem[i+2] = intToHex(int(ones))
+			}
+			pc++
+		},
+		elapsedMicroseconds: 927,
+		name:                "Fx33: LD B, Vx",
+		description:         "Store BCD representation of Vx in memory locations I, I+1, and I+2.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF055
+		},
+		exec: func(op uint16) {
+			maxReg := byte((op & 0x0F00) >> 2)
+			for itr := byte(0); itr <= maxReg; itr++ {
+				rx := numToReg(itr)
+				mem[i+uint16(itr)] = *rx
+			}
+		},
+		elapsedMicroseconds: 605,
+		name:                "Fx55: LD [I], Vx",
+		description:         "Store registers V0 through Vx in memory starting at location I.",
+	},
+	{
+		matches: func(op uint16) bool {
+			return op&0xF0FF == 0xF065
+		},
+		exec: func(op uint16) {
+			maxReg := byte((op & 0x0F00) >> 2)
+			for itr := byte(0); itr <= maxReg; itr++ {
+				rx := numToReg(itr)
+				*rx = mem[i+uint16(itr)]
+			}
+		},
+		elapsedMicroseconds: 605,
+		name:                "Fx65: LD Vx, [I]",
+		description:         "Read registers V0 through Vx from memory starting at location I.",
+	},
 }
