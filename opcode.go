@@ -39,8 +39,8 @@ var opcodes = []opcode{
 			return op == 0x00EE
 		},
 		exec: func(op uint16) {
-			pc = stack[sp]
 			sp--
+			pc = stack[sp]
 		},
 		elapsedMicroseconds: 105,
 		name:                "00EE: RET",
@@ -62,8 +62,8 @@ var opcodes = []opcode{
 			return op >= 0x2000 && op < 0x3000
 		},
 		exec: func(op uint16) {
-			sp++
 			stack[sp] = pc
+			sp++
 			pc = op & 0x0FFF
 		},
 		elapsedMicroseconds: 105,
