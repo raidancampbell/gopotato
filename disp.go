@@ -46,11 +46,13 @@ func drawSprite(sprite []byte, originX, originY byte) bool {
 	for y, spriteByte := range sprite {
 		for bitIdx := byte(0); bitIdx < 8; bitIdx++ {
 			drawPixel := (0x80>>bitIdx)&spriteByte > 0
+
 			isLit := disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES]
-			if isLit && !drawPixel {
+			if isLit && drawPixel {
 				didErase = true
 			}
-			disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES] = drawPixel
+			// pixels are drawn via xor. with no xor logical operator, we must expand it
+			disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES] = (drawPixel || isLit) && !(drawPixel && isLit)
 		}
 	}
 	return didErase
@@ -62,9 +64,11 @@ func drawWindow(imd *imdraw.IMDraw) {
 
 	for rownum, row := range disp.fb {
 		for colnum, pix := range row {
-			if !pix { // only draw anything if the pixel is lit.  we
+			if !pix { // only draw anything if the pixel is lit.
 				continue
 			}
+			// origin according to Pixel is the lower left corner
+			// the CHIP-8 and our framebuffer use the upper left corner
 			imd.Color = colornames.White
 			imd.Push(pixel.V(float64(rownum*SCALE), float64(YRES*SCALE-colnum*SCALE)),
 				pixel.V(float64(rownum*SCALE+1*SCALE), float64(YRES*SCALE-colnum*SCALE+1*SCALE)))

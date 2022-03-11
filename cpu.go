@@ -44,6 +44,7 @@ func init() {
 	disp = display{
 		Mutex: &sync.Mutex{},
 	}
+	keyPress = make(chan byte)
 }
 
 // emulate the CPU at 512hz

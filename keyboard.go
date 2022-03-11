@@ -16,7 +16,6 @@ func pollForKeys() {
 			if !keys[key] && keyWaiting {
 				keyPress <- keyToNibble(key)
 				keyWaiting = false
-				keyPress <- keyToNibble(key)
 			}
 			keys[key] = true
 		} else {

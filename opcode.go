@@ -21,18 +21,6 @@ kk or byte - An 8-bit value, the lowest 8 bits of the instruction
 */
 
 var opcodes = []opcode{
-	//{
-	//	matches: func(op uint16) bool {
-	//		// This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.
-	//		return false
-	//	},
-	//	exec: func(op uint16) {
-	//
-	//	},
-	//	elapsedMicroseconds: 0,
-	//	name:                "0nnn: SYS addr",
-	//	description:         "Jump to a machine code routine at nnn",
-	//},
 	{
 		matches: func(op uint16) bool {
 			return op == 0x00E0
@@ -344,7 +332,7 @@ var opcodes = []opcode{
 	},
 	{
 		matches: func(op uint16) bool {
-			return op >= 0xB000 && op < 0xC000
+			return op >= 0xC000 && op < 0xD000
 		},
 		exec: func(op uint16) {
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
