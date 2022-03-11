@@ -487,13 +487,13 @@ var opcodes = []opcode{
 			}
 			if *rx >= 10 {
 				hundreds := *rx / 100
-				tens := (*rx - hundreds) / 10
+				tens := (*rx - hundreds*100) / 10
 				mem[i+1] = intToHex(int(tens))
 			}
 			if *rx >= 1 {
 				hundreds := *rx / 100
-				tens := (*rx - hundreds) / 10
-				ones := *rx - hundreds - tens
+				tens := (*rx - hundreds*100) / 10
+				ones := *rx - hundreds*100 - tens*10
 				mem[i+2] = intToHex(int(ones))
 			}
 			pc += 2
