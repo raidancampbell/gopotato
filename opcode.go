@@ -28,6 +28,7 @@ var opcodes = []opcode{
 		exec: func(op uint16) {
 			pc += 2
 			disp.fb = framebuffer{}
+			disp.updated = true
 		},
 		elapsedMicroseconds: 109,
 		name:                "00E0: CLS",

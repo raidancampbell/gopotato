@@ -16,8 +16,9 @@ const (
 
 type display struct {
 	*sync.Mutex
-	fb     framebuffer
-	window *pixelgl.Window
+	fb      framebuffer
+	updated bool
+	window  *pixelgl.Window
 }
 type framebuffer [XRES][YRES]bool
 
@@ -42,10 +43,15 @@ func initDisp() {
 func drawSprite(sprite []byte, originX, originY byte) bool {
 	disp.Lock()
 	defer disp.Unlock()
+	disp.updated = true
 	didErase := false
 	for y, spriteByte := range sprite {
 		for bitIdx := byte(0); bitIdx < 8; bitIdx++ {
 			drawPixel := (0x80>>bitIdx)&spriteByte > 0
+			// cheap short circuit around the xor before evaluating hundreds of modulo ops
+			if !drawPixel {
+				continue
+			}
 
 			isLit := disp.fb[(originX+bitIdx)%XRES][(originY+byte(y))%YRES]
 			if isLit && drawPixel {
@@ -61,6 +67,13 @@ func drawSprite(sprite []byte, originX, originY byte) bool {
 func drawWindow(imd *imdraw.IMDraw) {
 	disp.Lock()
 	defer disp.Unlock()
+	defer disp.window.Update()
+	if !disp.updated {
+		return
+	}
+
+	disp.window.Clear(colornames.Black)
+	imd.Clear()
 
 	for rownum, row := range disp.fb {
 		for colnum, pix := range row {
@@ -75,4 +88,7 @@ func drawWindow(imd *imdraw.IMDraw) {
 			imd.Rectangle(0.)
 		}
 	}
+
+	imd.Draw(disp.window)
+
 }
