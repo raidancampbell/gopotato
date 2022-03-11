@@ -3,14 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/faiface/pixel/pixelgl"
+	"sync"
 )
 
 var (
 	keyPress   chan byte
 	keyWaiting bool
+	kbMutex    sync.Mutex
 )
 
 func pollForKeys() {
+	kbMutex.Lock() // prevent concurrent map access on reads
+	defer kbMutex.Unlock()
 	for key, _ := range keys {
 		if disp.window.Pressed(key) {
 			if !keys[key] && keyWaiting {
@@ -82,6 +86,9 @@ func keyToNibble(key pixelgl.Button) byte {
 }
 
 func isKeyPressed(nibble byte) bool {
+	kbMutex.Lock() // prevent concurrent map access on reads
+	defer kbMutex.Unlock()
+
 	if nibble > 0x0F {
 		panic(fmt.Sprintf("malformed nibble given to numToReg: %x", nibble))
 	}
