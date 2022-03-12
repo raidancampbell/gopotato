@@ -8,10 +8,7 @@ import (
 )
 
 func main() {
-	//err := loadROM("pong.ch8")
-	//err := loadROM("zero_demo.ch8")
-	err := loadROM("ibm.ch8")
-	//err := loadROM("invaders2.ch8")
+	err := loadROM("chip8-roms/programs/IBM Logo.ch8")
 	if err != nil {
 		panic(err)
 	}
