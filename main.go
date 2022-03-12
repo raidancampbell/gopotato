@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	DEBUG_OUTPUT = false
+)
+
 func main() {
 	err := loadROM("chip8-roms/programs/IBM Logo.ch8")
 	if err != nil {
