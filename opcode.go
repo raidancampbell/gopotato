@@ -372,7 +372,8 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xE09E
 		},
 		exec: func(op uint16) {
-			k := isKeyPressed(byte((op & 0x0F00) >> (4 * 2)))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			k := isKeyPressed(*rx)
 			if k {
 				pc += 2
 			}
@@ -387,7 +388,8 @@ var opcodes = []opcode{
 			return op&0xF0FF == 0xE0A1
 		},
 		exec: func(op uint16) {
-			k := isKeyPressed(byte((op & 0x0F00) >> (4 * 2)))
+			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			k := isKeyPressed(*rx)
 			if !k {
 				pc += 2
 			}
