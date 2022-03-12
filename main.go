@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"os"
+	"runtime"
+	"runtime/pprof"
 	"time"
 )
 
 const (
+	CPU_PROFILE  = false
+	MEM_PROFILE  = false
 	DEBUG_OUTPUT = false
 )
 
@@ -20,6 +25,18 @@ func main() {
 }
 
 func run() {
+	if CPU_PROFILE {
+		f, err := os.Create("cpu.pprof")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			panic(err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	initDisp()
 	go timerTick()
 	go tick()
@@ -38,4 +55,17 @@ func run() {
 		default:
 		}
 	}
+
+	if MEM_PROFILE {
+		f, err := os.Create("mem.pprof")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close() // error handling omitted for example
+		runtime.GC()    // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			panic(err)
+		}
+	}
+	initDisp()
 }
