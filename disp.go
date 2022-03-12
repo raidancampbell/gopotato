@@ -17,6 +17,7 @@ const (
 type display struct {
 	*sync.Mutex
 	fb      framebuffer
+	prevFB  framebuffer
 	updated bool
 	window  *pixelgl.Window
 }
@@ -72,17 +73,18 @@ func drawWindow(imd *imdraw.IMDraw) {
 		return
 	}
 
-	disp.window.Clear(colornames.Black)
-	imd.Clear()
-
 	for rownum, row := range disp.fb {
 		for colnum, pix := range row {
-			if !pix { // only draw anything if the pixel is lit.
+			if pix == disp.prevFB[rownum][colnum] {
 				continue
+			}
+			if pix {
+				imd.Color = colornames.White
+			} else {
+				imd.Color = colornames.Black
 			}
 			// origin according to Pixel is the lower left corner
 			// the CHIP-8 and our framebuffer use the upper left corner
-			imd.Color = colornames.White
 			imd.Push(pixel.V(float64(rownum*SCALE), float64(YRES*SCALE-(colnum+1)*SCALE)),
 				pixel.V(float64(rownum*SCALE+1*(SCALE-1)), float64(YRES*SCALE-(colnum+1)*SCALE+1*(SCALE-1))))
 			imd.Rectangle(0.)
@@ -90,5 +92,5 @@ func drawWindow(imd *imdraw.IMDraw) {
 	}
 
 	imd.Draw(disp.window)
-
+	disp.prevFB = disp.fb
 }

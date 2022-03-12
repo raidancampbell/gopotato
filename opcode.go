@@ -26,6 +26,8 @@ var opcodes = []opcode{
 			return op == 0x00E0
 		},
 		exec: func(op uint16) {
+			disp.Lock()
+			defer disp.Unlock()
 			pc += 2
 			disp.fb = framebuffer{}
 			disp.updated = true
