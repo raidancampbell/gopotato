@@ -49,7 +49,7 @@ func init() {
 
 // emulate the CPU at 512hz
 func tick() {
-	tim := time.NewTicker(19530 * time.Microsecond)
+	tim := time.NewTicker(1953 * time.Microsecond)
 	for {
 		select {
 		case <-tim.C:
