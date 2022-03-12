@@ -62,7 +62,7 @@ var opcodes = []opcode{
 			return op >= 0x2000 && op < 0x3000
 		},
 		exec: func(op uint16) {
-			stack[sp] = pc
+			stack[sp] = pc + 2
 			sp++
 			pc = op & 0x0FFF
 		},
@@ -456,7 +456,13 @@ var opcodes = []opcode{
 		},
 		exec: func(op uint16) {
 			rx := numToReg(byte((op & 0x0F00) >> (4 * 2)))
+			oldI := i
 			i += uint16(*rx)
+			if oldI > i {
+				*vf = 0x01
+			} else {
+				*vf = 0x00
+			}
 			pc += 2
 		},
 		elapsedMicroseconds: 86,
