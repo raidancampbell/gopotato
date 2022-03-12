@@ -83,8 +83,8 @@ func drawWindow(imd *imdraw.IMDraw) {
 			// origin according to Pixel is the lower left corner
 			// the CHIP-8 and our framebuffer use the upper left corner
 			imd.Color = colornames.White
-			imd.Push(pixel.V(float64(rownum*SCALE), float64(YRES*SCALE-colnum*SCALE)),
-				pixel.V(float64(rownum*SCALE+1*(SCALE-1)), float64(YRES*SCALE-colnum*SCALE+1*(SCALE-1))))
+			imd.Push(pixel.V(float64(rownum*SCALE), float64(YRES*SCALE-(colnum+1)*SCALE)),
+				pixel.V(float64(rownum*SCALE+1*(SCALE-1)), float64(YRES*SCALE-(colnum+1)*SCALE+1*(SCALE-1))))
 			imd.Rectangle(0.)
 		}
 	}
